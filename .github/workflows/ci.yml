@@ -1,0 +1,36 @@
+name: Rust and native E2E
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo run --manifest-path tests/e2e/Cargo.toml
+      - run: cargo run --manifest-path tests/e2e/Cargo.toml --features full-floating-point-register-pack
+      - run: cargo package
+      - name: External Cargo Git consumer
+        if: github.event_name != 'pull_request'
+        run: python tools/check-git.py ${{ github.sha }}
+  msrv:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.85.0
+      - run: cargo build
