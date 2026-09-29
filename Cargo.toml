@@ -1,0 +1,23 @@
+[package]
+name = "dobby-sys"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+links = "dobby"
+description = "Raw Rust bindings to the psyche314 Dobby fork"
+license = "Apache-2.0"
+repository = "https://github.com/psyche314/dobby-sys"
+readme = "README.md"
+include = [
+    "Cargo.toml", "build.rs", "src/**", "LICENSE", "README.md",
+    "dobby/CMakeLists.txt", "dobby/cmake/**", "dobby/include/**",
+    "dobby/source/**", "dobby/common/**", "dobby/external/**",
+    "dobby/builtin-plugin/**", "dobby/LICENSE",
+]
+
+[features]
+full-floating-point-register-pack = []
+native-debug = []
+
+[build-dependencies]
+cmake = "0.1.54"
